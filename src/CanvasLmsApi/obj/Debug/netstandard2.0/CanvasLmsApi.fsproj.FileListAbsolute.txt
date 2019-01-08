@@ -1,8 +1,0 @@
-C:\Users\wekel\Projects\canvas-lms-dotnet\src\CanvasLmsApi\bin\Debug\netstandard2.0\CanvasLmsApi.deps.json
-C:\Users\wekel\Projects\canvas-lms-dotnet\src\CanvasLmsApi\bin\Debug\netstandard2.0\CanvasLmsApi.dll
-C:\Users\wekel\Projects\canvas-lms-dotnet\src\CanvasLmsApi\bin\Debug\netstandard2.0\CanvasLmsApi.pdb
-C:\Users\wekel\Projects\canvas-lms-dotnet\src\CanvasLmsApi\obj\Debug\netstandard2.0\CanvasLmsApi.fsprojAssemblyReference.cache
-C:\Users\wekel\Projects\canvas-lms-dotnet\src\CanvasLmsApi\obj\Debug\netstandard2.0\CanvasLmsApi.AssemblyInfoInputs.cache
-C:\Users\wekel\Projects\canvas-lms-dotnet\src\CanvasLmsApi\obj\Debug\netstandard2.0\CanvasLmsApi.AssemblyInfo.fs
-C:\Users\wekel\Projects\canvas-lms-dotnet\src\CanvasLmsApi\obj\Debug\netstandard2.0\CanvasLmsApi.dll
-C:\Users\wekel\Projects\canvas-lms-dotnet\src\CanvasLmsApi\obj\Debug\netstandard2.0\CanvasLmsApi.pdb

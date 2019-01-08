@@ -5,10 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="CanvasSite.fs" />
+    <Compile Include="FSharpUtils.fs" />
+    <Compile Include="CanvasMethodCall.fs" />
     <Compile Include="HttpUtils.fs" />
     <Compile Include="Courses.fs" />
     <Compile Include="Modules.fs" />
+    <Compile Include="Assignments.fs" />
+    <Compile Include="Quizzes.fs" />
+    <Compile Include="Pages.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -14,20 +14,24 @@ let readCommandLine desc argi (argv: string[]) =
 [<EntryPoint>]
 let main argv =
 
-    let site = 
-        { CanvasSite.BaseUrl = readCommandLine "Enter the Canvas site" 0 argv
-          AccessToken = readCommandLine "Enter your access token" 1 argv }
+    let site = readCommandLine "Enter the Canvas site" 0 argv
+    let accessToken = readCommandLine "Enter your access token" 1 argv
 
-    let courses = Courses.Get(site)
-
+    let courses = Courses.Get(site, accessToken)
     for c in courses do
         printfn "%d\t%s\t%s" c.Id c.Term.Name c.Name
 
     let courseId = getInput "Enter a course number" |> Convert.ToInt64
 
-    let modules = Modules.Get(site, courseId)
-
+    let modules = Modules.Get(site, accessToken, courseId)
     for m in modules do
         printfn "%d\t%s" m.Id m.Name
+
+    let moduleId = getInput "Enter a module number" |> Convert.ToInt64
+
+    let moduleItems = Modules.GetItems(site, accessToken, courseId, moduleId)
+    for i in moduleItems do
+        printfn "%d\t%s (%A)" i.Id i.Title i.ModuleItemType
+
 
     0 // return an integer exit code

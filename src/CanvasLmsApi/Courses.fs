@@ -1,9 +1,6 @@
 namespace CanvasLmsApi
 
 open System
-open FSharp.Data
-open Newtonsoft.Json
-open Newtonsoft.Json.Serialization
 
 // From https://canvas.instructure.com/doc/api/courses.html
 
@@ -21,6 +18,9 @@ type Course =
 
 module Courses =
 
-    let Endpoint = "/api/v1/courses"
-
-    let Get site = HttpUtils.GetAll<Course> site Endpoint [("include[]", "term")]
+    let Get(site, accessToken) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses",
+            [ "include[]", "term" ])
+        |> HttpUtils.GetAll<Course>

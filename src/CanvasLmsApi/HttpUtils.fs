@@ -1,11 +1,9 @@
 module CanvasLmsApi.HttpUtils
 
-open System.Text.RegularExpressions
 open FSharp.Data
 open Newtonsoft.Json
 open Newtonsoft.Json.Serialization
 open CanvasLmsApi
-open Newtonsoft.Json
 
 // https://www.newtonsoft.com/json/help/html/NamingStrategySnakeCase.htm
 let private settings =
@@ -13,8 +11,15 @@ let private settings =
         ContractResolver = DefaultContractResolver(
             NamingStrategy = SnakeCaseNamingStrategy()))
             
+let private appendAccessToken (accessToken: string) (url: string) =
+    let delimiter =
+        match url.Contains("?") with
+        | false -> '?'
+        | true -> '&'
+    sprintf "%s%caccess_token=%s" url delimiter accessToken
+    
 // https://canvas.instructure.com/doc/api/file.pagination.html
-let private tryGetNextLink (site: CanvasSite) (response: HttpResponse) =
+let private tryGetNextLink (accessToken: string) (response: HttpResponse) =
     match response.Headers.ContainsKey("Link") with
     | false -> None
     | true ->
@@ -22,9 +27,9 @@ let private tryGetNextLink (site: CanvasSite) (response: HttpResponse) =
         |> fun h -> h.Split([| ',' |])
         |> Seq.tryFind(fun s -> s.Contains("rel=\"next\""))
         |> Option.map(fun s -> s.Split([| ';' |]).[0].Replace("<", "").Replace(">", ""))
-        |> Option.map(site.AppendAccessToken)
+        |> Option.map(appendAccessToken accessToken)
 
-let rec private getAllLinkedItems<'T> (site: CanvasSite) link queryParams (prev: 'T list) =
+let rec private getAllLinkedItems<'T> (accessToken: string) (queryParams: list<string * string>) link (prev: 'T list) =
     let response = Http.Request(link, query = queryParams)
     let items =
         match response.Body with
@@ -32,11 +37,17 @@ let rec private getAllLinkedItems<'T> (site: CanvasSite) link queryParams (prev:
         | Text(responseString) ->
             JsonConvert.DeserializeObject<'T list>(responseString, settings)
             |> List.append prev
-    match tryGetNextLink site response with
+    match tryGetNextLink accessToken response with
     | None -> items
-    | Some(nextLink) -> getAllLinkedItems<'T> site nextLink queryParams items
+    | Some(nextLink) -> getAllLinkedItems<'T> accessToken queryParams nextLink items
 
+let GetAll<'T> (methodCall: CanvasMethodCall) =
+    let link = methodCall.GetUrlString()
+    getAllLinkedItems<'T> methodCall.AccessToken (methodCall.GetQueryParameters()) link []
+    |> List.toArray
 
-let GetAll<'T> (site: CanvasSite) endpoint queryParams =
-    let link = endpoint |> site.CreateUrl 
-    getAllLinkedItems<'T> site link queryParams []
+let Post<'T> (methodCall: CanvasMethodCall) =
+    let response = Http.Request(methodCall.GetUrlString(), body = FormValues(methodCall.GetQueryParameters()))
+    match response.Body with
+    | Binary(_) -> failwith "Binary responses are not handled"
+    | Text(responseString) -> JsonConvert.DeserializeObject<'T>(responseString)
