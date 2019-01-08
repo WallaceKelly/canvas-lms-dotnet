@@ -13,6 +13,8 @@
     <Compile Include="Assignments.fs" />
     <Compile Include="Quizzes.fs" />
     <Compile Include="Pages.fs" />
+    <Compile Include="Discussions.fs" />
+    <Compile Include="Activities.fs" />
   </ItemGroup>
 
   <ItemGroup>

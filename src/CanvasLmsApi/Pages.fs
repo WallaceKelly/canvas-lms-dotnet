@@ -11,9 +11,16 @@ type Page =
 
 module Pages =
 
-    let Get(site, accessToken, courseId: Int64) =
+    let GetAll(site, accessToken, courseId: Int64) =
         CanvasMethodCall.Create(
             site, accessToken,
             "/api/v1/courses/:courseId/pages",
             [ "courseId", courseId ])
-        |> HttpUtils.GetAll<Module>
+        |> HttpUtils.GetAll<Page>
+
+    let Get(site, accessToken, courseId: Int64, pageId: string) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:courseId/pages",
+            [ "courseId", courseId :> obj; "pageId", pageId :> obj ])
+        |> HttpUtils.GetSingle<Page>

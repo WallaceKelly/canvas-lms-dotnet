@@ -18,9 +18,17 @@ type Course =
 
 module Courses =
 
-    let Get(site, accessToken) =
+    let GetAll(site, accessToken) =
         CanvasMethodCall.Create(
             site, accessToken,
             "/api/v1/courses",
             [ "include[]", "term" ])
         |> HttpUtils.GetAll<Course>
+
+    let Get(site, accessToken, courseId: Int64) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:courseId",
+            [ "include[]", "term" :> obj
+              "courseId", courseId :> obj])
+        |> HttpUtils.GetSingle<Course>

@@ -29,22 +29,21 @@ let private tryGetNextLink (accessToken: string) (response: HttpResponse) =
         |> Option.map(fun s -> s.Split([| ';' |]).[0].Replace("<", "").Replace(">", ""))
         |> Option.map(appendAccessToken accessToken)
 
-let rec private getAllLinkedItems<'T> (accessToken: string) (queryParams: list<string * string>) link (prev: 'T list) =
-    let response = Http.Request(link, query = queryParams)
-    let items =
-        match response.Body with
-        | Binary(_) -> failwith "Binary responses are not handled"
-        | Text(responseString) ->
-            JsonConvert.DeserializeObject<'T list>(responseString, settings)
-            |> List.append prev
-    match tryGetNextLink accessToken response with
-    | None -> items
-    | Some(nextLink) -> getAllLinkedItems<'T> accessToken queryParams nextLink items
-
 let GetAll<'T> (methodCall: CanvasMethodCall) =
+    let mutable link = Some(methodCall.GetUrlString())
+    seq {
+        while link.IsSome do
+            let response = Http.Request(link.Value, query = methodCall.GetQueryParameters())
+            match response.Body with
+            | Text(responseString) -> yield! JsonConvert.DeserializeObject<'T seq>(responseString, settings)
+            | Binary(_) -> failwith "Binary responses are not handled"
+            link <- tryGetNextLink methodCall.AccessToken response
+    }
+    |> Seq.cache
+
+let GetSingle<'T> (methodCall: CanvasMethodCall) =
     let link = methodCall.GetUrlString()
-    getAllLinkedItems<'T> methodCall.AccessToken (methodCall.GetQueryParameters()) link []
-    |> List.toArray
+    GetAll(methodCall) |> Seq.tryHead
 
 let Post<'T> (methodCall: CanvasMethodCall) =
     let response = Http.Request(methodCall.GetUrlString(), body = FormValues(methodCall.GetQueryParameters()))

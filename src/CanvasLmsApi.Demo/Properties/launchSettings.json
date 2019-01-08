@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CanvasLmsApi.Demo": {
+      "commandName": "Project",
+      "commandLineArgs": "https://phc.instructure.com 10763~32zRxO0iBpP8UOLUChTpMksTsQ8sdO8b80acwCbLghzzSuEhuuMD9tMnRaK14vtp"
+    }
+  }
+}
