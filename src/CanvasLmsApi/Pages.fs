@@ -14,13 +14,14 @@ module Pages =
     let GetAll(site, accessToken, courseId: Int64) =
         CanvasMethodCall.Create(
             site, accessToken,
-            "/api/v1/courses/:courseId/pages",
-            [ "courseId", courseId ])
+            "/api/v1/courses/:course_id/pages",
+            [ "course_id", courseId ])
         |> HttpUtils.GetAll<Page>
 
-    let Get(site, accessToken, courseId: Int64, pageId: string) =
+    let Get(site, accessToken, courseId: Int64, pageUrl: string) =
         CanvasMethodCall.Create(
             site, accessToken,
-            "/api/v1/courses/:courseId/pages",
-            [ "courseId", courseId :> obj; "pageId", pageId :> obj ])
+            "/api/v1/courses/:course_id/pages/:url",
+            [ "course_id", courseId :> obj
+              "url", pageUrl :> obj ])
         |> HttpUtils.GetSingle<Page>

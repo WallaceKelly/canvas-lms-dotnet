@@ -2,7 +2,7 @@
   "profiles": {
     "CanvasLmsApi.Demo": {
       "commandName": "Project",
-      "commandLineArgs": "https://phc.instructure.com 10763~32zRxO0iBpP8UOLUChTpMksTsQ8sdO8b80acwCbLghzzSuEhuuMD9tMnRaK14vtp"
+      "commandLineArgs": "https://canvas.instructure.com 7~wS4EZic3CuXcN6R185v18xb8OtLc4q6pBFFxOtKZdJpzR2Cd1cCz1hFEi4hogINM"
     }
   }
 }

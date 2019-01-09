@@ -28,7 +28,6 @@ let main argv =
     //    printfn "%d\t%s" m.Id m.Name
 
     //let moduleId = getInput "Enter a module number" |> Convert.ToInt64
-
     //let moduleItems = Modules.GetItems(site, accessToken, courseId, moduleId)
     //for i in moduleItems do
     //    printfn "%d\t%s (%A)" i.Id i.Title i.ModuleItemType
@@ -36,6 +35,19 @@ let main argv =
     let activities = Activities.GetAll(site, accessToken, courseId)
     for a in activities do
         printfn "%A" a
+
+    let title = getInput "Enter an existing activity title"
+    let activity = activities |> Seq.tryFind(fun a -> a.Title = title)
+    match activity with
+    | None -> failwith "Could not find matching activity"
+    | Some(a) ->
+
+        let newModuleName = getInput "Enter a new module name" 
+        let newModule = Activities.CreateModule(site, accessToken, courseId, newModuleName, [ a ])
+        let newModuleItems = Modules.GetItems(site, accessToken, courseId, newModule.Id)
+        for i in newModuleItems do
+            printfn "%d\t%s (%A)" i.Id i.Title i.ModuleItemType
+
 
     
     0 // return an integer exit code

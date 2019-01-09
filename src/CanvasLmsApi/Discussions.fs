@@ -14,13 +14,14 @@ module Discussions =
     let GetAll(site, accessToken, courseId: Int64) =
         CanvasMethodCall.Create(
             site, accessToken,
-            "/api/v1/courses/:courseId/discussion_topics",
-            [ "courseId", courseId ])
+            "/api/v1/courses/:course_id/discussion_topics",
+            [ "course_id", courseId ])
         |> HttpUtils.GetAll<Discussion>
 
     let Get(site, accessToken, courseId: Int64, discussionId: Int64) =
         CanvasMethodCall.Create(
             site, accessToken,
-            "/api/v1/courses/:courseId/discussion_topics/:discussionId",
-            [ "courseId", courseId; "discussionId", discussionId ])
+            "/api/v1/courses/:course_id/discussion_topics/:discussion_id",
+            [ "course_id", courseId
+              "discussion_id", discussionId ])
         |> HttpUtils.GetSingle<Discussion>

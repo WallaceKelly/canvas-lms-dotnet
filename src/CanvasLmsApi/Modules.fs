@@ -18,6 +18,21 @@ type ModuleItemType =
         override this.ToString() = FSharpUtils.toString this
         static member fromString s = FSharpUtils.fromString<ModuleItemType> s
 
+type ModuleItemContentId =
+     | Page of string // page_url
+     | Other of Int64 // content_id
+
+type ModuleItemCompletionRequirement = 
+     | NoRequirement
+     | MustView
+     | MustContribute
+     | MustSubmit
+     override x.ToString() =
+        match x with
+        | NoRequirement -> ""
+        | MustView -> "must_view"
+        | MustContribute -> "must_contribute"
+        | MustSubmit -> "must_submit"
 
 [<CLIMutable>]
 type ModuleItem =
@@ -44,17 +59,47 @@ module Modules =
     let GetAll(site, accessToken, courseId: Int64) =
         CanvasMethodCall.Create(
             site, accessToken,
-            "/api/v1/courses/:courseId/modules",
-            [ "courseId", courseId ])
+            "/api/v1/courses/:course_id/modules",
+            [ "course_id", courseId ])
         |> HttpUtils.GetAll<Module>
+
+    let Get(site, accessToken, courseId: Int64, moduleId: Int64) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/modules",
+            [ "course_id", courseId
+              "module_id", moduleId ])
+        |> HttpUtils.GetAll<Module>
+
+    let Create(site, accessToken, courseId: Int64, name: string) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/modules",
+            [ "course_id", courseId :> obj
+              "module[name]", name :> obj ]
+        )
+        |> HttpUtils.Post<Module>
 
     let GetItems(site, accessToken, courseId: Int64, moduleId: Int64) =
         CanvasMethodCall.Create(
             site, accessToken,
-            "/api/v1/courses/:courseId/modules/:moduleId/items",
-            [ "courseId", courseId; "moduleId", moduleId ])
+            "/api/v1/courses/:course_id/modules/:module_id/items",
+            [ "course_id", courseId
+              "module_id", moduleId ])
         |> HttpUtils.GetAll<ModuleItem> 
 
-    //let CreateModuleItem(site, courseId: Int64, newModule: ModuleItem) =
-    //    let endpoint = sprintf "/api/v1/courses/%d/modules/%d/items" courseId newModule.ModuleId
-    //    HttpUtils.Post()
+    let CreateItem(site, accessToken, courseId: Int64, moduleId: Int64,
+                    itemType: ModuleItemType, itemContentId: ModuleItemContentId, requirement: ModuleItemCompletionRequirement) =
+        let contentIdParameter =
+            match itemContentId with
+            | Page(s) -> "module_item[page_url]", s :> obj
+            | Other(id) -> "module_item[content_id]", id :> obj
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/modules/:module_id/items",
+            [ "course_id", courseId :> obj
+              "module_id", moduleId :> obj
+              "module_item[type]", itemType.ToString() :> obj
+              contentIdParameter
+              "module_item[completion_requirement][type]", requirement.ToString() :> obj] )
+        |> HttpUtils.Post<ModuleItem> 

@@ -42,8 +42,7 @@ let GetAll<'T> (methodCall: CanvasMethodCall) =
     |> Seq.cache
 
 let GetSingle<'T> (methodCall: CanvasMethodCall) =
-    let link = methodCall.GetUrlString()
-    GetAll(methodCall) |> Seq.tryHead
+    GetAll<'T>(methodCall) |> Seq.tryHead
 
 let Post<'T> (methodCall: CanvasMethodCall) =
     let response = Http.Request(methodCall.GetUrlString(), body = FormValues(methodCall.GetQueryParameters()))
