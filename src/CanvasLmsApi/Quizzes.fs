@@ -7,7 +7,9 @@ open System
 [<CLIMutable>]
 type Quiz =
     { Id: Int64
-      Title: string }
+      Title: string
+      HtmlUrl: string
+      Published: bool }
 
 module Quizzes =
 

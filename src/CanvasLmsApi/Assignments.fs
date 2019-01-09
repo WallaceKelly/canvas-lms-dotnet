@@ -4,10 +4,41 @@ open System
 
 // From https://canvas.instructure.com/doc/api/assignments.html
 
+type AssignmentSubmissionType =
+     | NoSubmission
+     | DiscussionTopic
+     | OnlineQuiz
+     | OnPaper
+     | ExternalTool
+     | OnlineTextEntry
+     | OnlineUrl
+     | OnlineUpload
+     | MediaRecording
+     static member FromString (s: string) =
+        let submissionTypeStrings = 
+            [ "none", NoSubmission 
+              "discussion_topic", DiscussionTopic 
+              "online_quiz", OnlineQuiz
+              "on_paper", OnPaper
+              "external_tool", ExternalTool
+              "online_text_entry", OnlineTextEntry
+              "online_url", OnlineUrl
+              "online_upload", OnlineUpload
+              "media_recording", MediaRecording
+            ] |> dict
+        match submissionTypeStrings.ContainsKey(s) with
+        | true -> submissionTypeStrings.[s]
+        | false -> NoSubmission
+
 [<CLIMutable>]
 type Assignment =
     { Id: Int64
-      Name: string }
+      Name: string
+      HtmlUrl: string
+      SubmissionTypes: string[]
+      Published: bool
+      QuizId: Nullable<Int64> }
+    member x.AssignmentSubmissionTypes = x.SubmissionTypes |> Array.map(AssignmentSubmissionType.FromString)
 
 module Assignments =
 

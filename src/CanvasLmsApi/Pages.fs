@@ -6,8 +6,10 @@ open System
 
 [<CLIMutable>]
 type Page =
-    { Url: string
-      Title: string }
+    { Url: string // unique identifier
+      Title: string
+      HtmlUrl: string
+      Published: bool }
 
 module Pages =
 

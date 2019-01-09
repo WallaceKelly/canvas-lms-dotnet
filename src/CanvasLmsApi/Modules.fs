@@ -21,6 +21,10 @@ type ModuleItemType =
 type ModuleItemContentId =
      | Page of string // page_url
      | Other of Int64 // content_id
+     override x.ToString() = 
+        match x with
+        | Page(page_url) -> page_url
+        | Other(content_id) -> content_id.ToString()
 
 type ModuleItemCompletionRequirement = 
      | NoRequirement
