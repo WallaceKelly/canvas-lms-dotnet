@@ -103,3 +103,11 @@ module Modules =
               contentIdParameter
               "module_item[completion_requirement][type]", requirement.ToString() :> obj] )
         |> HttpUtils.Post<ModuleItem> 
+
+    let Delete(site, accessToken, courseId: Int64, moduleId: Int64) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/modules/:module_id",
+            [ "course_id", courseId
+              "module_id", moduleId ])
+        |> HttpUtils.Delete<ModuleItem>

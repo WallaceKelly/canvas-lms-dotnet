@@ -45,7 +45,13 @@ let GetSingle<'T> (methodCall: CanvasMethodCall) =
     GetAll<'T>(methodCall) |> Seq.tryHead
 
 let Post<'T> (methodCall: CanvasMethodCall) =
-    let response = Http.Request(methodCall.GetUrlString(), body = FormValues(methodCall.GetQueryParameters()))
+    let response = Http.Request(methodCall.GetUrlString(), body = FormValues(methodCall.GetQueryParameters()), httpMethod = "Post")
+    match response.Body with
+    | Binary(_) -> failwith "Binary responses are not handled"
+    | Text(responseString) -> JsonConvert.DeserializeObject<'T>(responseString)
+
+let Delete<'T> (methodCall: CanvasMethodCall) =
+    let response = Http.Request(methodCall.GetUrlString(), body = FormValues(methodCall.GetQueryParameters()), httpMethod = "Delete")
     match response.Body with
     | Binary(_) -> failwith "Binary responses are not handled"
     | Text(responseString) -> JsonConvert.DeserializeObject<'T>(responseString)

@@ -47,7 +47,9 @@ let main argv =
         let newModuleItems = Modules.GetItems(site, accessToken, courseId, newModule.Id)
         for i in newModuleItems do
             printfn "%d\t%s (%A)" i.Id i.Title i.ModuleItemType
-
+        printf "Press any key to delete the new module..."
+        Console.ReadKey(true) |> ignore
+        Modules.Delete(site, accessToken, courseId, newModule.Id) |> ignore
 
     
     0 // return an integer exit code
