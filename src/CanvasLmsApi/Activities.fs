@@ -115,9 +115,9 @@ module Activities =
         |> Seq.iter(createModuleItem)
         newModule
 
-    let Edit(site, accessToken, courseId: Int64, activity: Activity, isPublished: bool) =
+    let Edit(site, accessToken, courseId: Int64, activity: Activity, isPublished: bool, due_at: Nullable<DateTime>) =
         match activity with
         | Page(p) -> Pages.Edit(site, accessToken, courseId, p.Url, isPublished) |> Activity.Page
-        | Assignment(a) -> Assignments.Edit(site, accessToken, courseId, a.Id, isPublished) |> Activity.Assignment
+        | Assignment(a) -> Assignments.Edit(site, accessToken, courseId, a.Id, isPublished, due_at) |> Activity.Assignment
         | Discussion(d) -> Discussions.Edit(site, accessToken, courseId, d.Id, isPublished) |> Activity.Discussion
-        | Quiz(q) -> Quizzes.Edit(site, accessToken, courseId, q.Id, isPublished) |> Activity.Quiz
+        | Quiz(q) -> Quizzes.Edit(site, accessToken, courseId, q.Id, isPublished, due_at) |> Activity.Quiz
