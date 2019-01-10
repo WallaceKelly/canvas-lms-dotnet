@@ -43,11 +43,15 @@ let main argv =
     | Some(a) ->
 
         let newModuleName = getInput "Enter a new module name" 
-        let newModule = Activities.CreateModule(site, accessToken, courseId, newModuleName, [ a ])
+        let newModule = Activities.CreateModule(site, accessToken, courseId, newModuleName, [ a ], false)
         let newModuleItems = Modules.GetItems(site, accessToken, courseId, newModule.Id)
         for i in newModuleItems do
             printfn "%d\t%s (%A)" i.Id i.Title i.ModuleItemType
-        printf "Press any key to delete the new module..."
+        printfn "Press any key to delete the new module items..."
+        Console.ReadKey(true) |> ignore
+        Modules.DeleteItems(site, accessToken, courseId, newModule.Id)
+        |> Seq.iter(fun mi -> printfn "\tDeleted: #%d, %s" mi.Id mi.Title)
+        printfn "Press any key to delete the new module..."
         Console.ReadKey(true) |> ignore
         Modules.Delete(site, accessToken, courseId, newModule.Id) |> ignore
 

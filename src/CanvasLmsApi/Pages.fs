@@ -27,3 +27,13 @@ module Pages =
             [ "course_id", courseId :> obj
               "url", pageUrl :> obj ])
         |> HttpUtils.GetSingle<Page>
+
+    let Edit(site, accessToken, courseId: Int64, pageUrl: string, published: bool) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/pages/:page_url",
+            [ "course_id", courseId :> obj
+              "page_url", pageUrl :> obj
+              "wiki_page[published]", published :> obj] )
+        |> HttpUtils.Put<Page>
+        

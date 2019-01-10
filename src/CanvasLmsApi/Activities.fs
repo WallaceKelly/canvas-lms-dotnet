@@ -40,7 +40,7 @@ type Activity =
         | Discussion(d) -> "Discussion"
         | Quiz(q) -> "Quiz"
         | Page(p) -> "Page"
-     static member ToContentId a =
+     static member ToIdString a =
         match a with
         | Assignment(a) -> a.Id.ToString()
         | Discussion(d) -> d.Id.ToString()
@@ -48,7 +48,7 @@ type Activity =
         | Page(p) -> p.Url
 
      member x.ActivityType = x |> Activity.ToActivityType
-     member x.ContentId = x |> Activity.ToContentId
+     member x.IdString = x |> Activity.ToIdString
      member x.Title = x |> Activity.GetTitle
      member x.HtmlUrl = x |> Activity.GetHtmlUrl
      member x.ModuleItemContentId = x |> Activity.ToModuleItemContentId
@@ -99,8 +99,8 @@ module Activities =
             else q :> obj
         |> fun o -> o :?> 'T
 
-    let CreateModule(site, accessToken, courseId: Int64, moduleName: string, activities: Activity seq) =
-        let newModule = Modules.Create(site, accessToken, courseId, moduleName)
+    let CreateModule(site, accessToken, courseId: Int64, moduleName: string, activities: Activity seq, isPublished: bool) =
+        let newModule = Modules.Create(site, accessToken, courseId, moduleName, isPublished)
         let getRequirement (a: Activity) =
             match a with
             | Page(_) -> ModuleItemCompletionRequirement.MustView
@@ -114,3 +114,10 @@ module Activities =
         |> Seq.map(fun a -> a.ModuleItemType, a.ModuleItemContentId, a |> getRequirement)
         |> Seq.iter(createModuleItem)
         newModule
+
+    let Edit(site, accessToken, courseId: Int64, activity: Activity, isPublished: bool) =
+        match activity with
+        | Page(p) -> Pages.Edit(site, accessToken, courseId, p.Url, isPublished) |> Activity.Page
+        | Assignment(a) -> Assignments.Edit(site, accessToken, courseId, a.Id, isPublished) |> Activity.Assignment
+        | Discussion(d) -> Discussions.Edit(site, accessToken, courseId, d.Id, isPublished) |> Activity.Discussion
+        | Quiz(q) -> Quizzes.Edit(site, accessToken, courseId, q.Id, isPublished) |> Activity.Quiz

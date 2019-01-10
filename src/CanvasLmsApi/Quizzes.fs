@@ -27,3 +27,13 @@ module Quizzes =
             [ "course_id", courseId
               "quiz_id", quizId ])
         |> HttpUtils.GetSingle<Quiz>
+
+    let Edit(site, accessToken, courseId: Int64, quizId: Int64, published: bool) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/quizzes/:quiz_id",
+            [ "course_id", courseId :> obj
+              "quiz_id", quizId :> obj
+              "quiz[published]", published :> obj] )
+        |> HttpUtils.Put<Quiz>
+        

@@ -45,11 +45,17 @@ type ModuleItem =
       Position: int
       Title: string
       Type: string
-      ContentId: Int64 }
+      PageUrl: string // for pages
+      ContentId: Int64 // for assignments, quizzes, etc.
+    }
     member x.ModuleItemType =
         match ModuleItemType.fromString(x.Type) with
         | Some(v) -> v
         | None -> Unknown
+    member x.IdString =
+        match x.ModuleItemType with
+        | ModuleItemType.Page -> x.PageUrl
+        | _ -> x.ContentId.ToString()
         
 
 [<CLIMutable>]
@@ -75,7 +81,7 @@ module Modules =
               "module_id", moduleId ])
         |> HttpUtils.GetAll<Module>
 
-    let Create(site, accessToken, courseId: Int64, name: string) =
+    let Create(site, accessToken, courseId: Int64, name: string, published: bool) =
         CanvasMethodCall.Create(
             site, accessToken,
             "/api/v1/courses/:course_id/modules",
@@ -83,6 +89,16 @@ module Modules =
               "module[name]", name :> obj ]
         )
         |> HttpUtils.Post<Module>
+
+    let Update(site, accessToken, courseId: Int64, moduleId: Int64, published: bool) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/modules/:module_id",
+            [ "course_id", courseId :> obj
+              "module_id", moduleId :> obj
+              "module[published]", published :> obj ]
+        )
+        |> HttpUtils.Put<Module>
 
     let GetItems(site, accessToken, courseId: Int64, moduleId: Int64) =
         CanvasMethodCall.Create(
@@ -114,4 +130,20 @@ module Modules =
             "/api/v1/courses/:course_id/modules/:module_id",
             [ "course_id", courseId
               "module_id", moduleId ])
+        |> HttpUtils.Delete<Module>
+
+
+    let DeleteItem(site, accessToken, courseId: Int64, moduleId: Int64, moduleItemId: Int64) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/modules/:module_id/items/:module_item_id",
+            [ "course_id", courseId
+              "module_id", moduleId
+              "module_item_id", moduleItemId ])
         |> HttpUtils.Delete<ModuleItem>
+
+        
+    let DeleteItems(site, accessToken, courseId, moduleId) =
+        GetItems(site, accessToken, courseId, moduleId)
+        |> Seq.map(fun i -> i.Id)
+        |> Seq.map(fun i -> DeleteItem(site, accessToken, courseId, moduleId, i))

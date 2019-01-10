@@ -27,3 +27,13 @@ module Discussions =
             [ "course_id", courseId
               "discussion_id", discussionId ])
         |> HttpUtils.GetSingle<Discussion>
+
+    let Edit(site, accessToken, courseId: Int64, topicId: Int64, published: bool) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/discussion_topics/:topic_id",
+            [ "course_id", courseId :> obj
+              "topic_id", topicId :> obj
+              "published", published :> obj] )
+        |> HttpUtils.Put<Discussion>
+        

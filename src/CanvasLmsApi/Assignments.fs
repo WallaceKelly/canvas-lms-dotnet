@@ -56,3 +56,13 @@ module Assignments =
             [ "course_id", courseId
               "assignment_id", assignmentId ])
         |> HttpUtils.GetSingle<Assignment>
+
+    let Edit(site, accessToken, courseId: Int64, assignmentId: Int64, published: bool) =
+        CanvasMethodCall.Create(
+            site, accessToken,
+            "/api/v1/courses/:course_id/assignments/:assignment_id",
+            [ "course_id", courseId :> obj
+              "assignment_id", assignmentId :> obj
+              "assignment[published]", published :> obj] )
+        |> HttpUtils.Put<Assignment>
+        
