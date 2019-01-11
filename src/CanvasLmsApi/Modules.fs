@@ -62,9 +62,18 @@ type ModuleItem =
 type Module =
     { Id: Int64
       Position: int
-      Name: string }
+      Name: string
+      PrerequisiteModuleIds: Int64[]
+      RequireSequentialProgress: bool
+      Published: bool }
 
 module Modules =
+
+    //let createListString (items: 'a seq) =
+    //    items
+    //    |> Seq.map(fun i -> i.ToString())
+    //    |> Seq.toArray
+    //    |> fun ids -> sprintf "[%s]" (String.Join(",", ids))
 
     let GetAll(site, accessToken, courseId: Int64) =
         CanvasMethodCall.Create(
@@ -76,28 +85,34 @@ module Modules =
     let Get(site, accessToken, courseId: Int64, moduleId: Int64) =
         CanvasMethodCall.Create(
             site, accessToken,
-            "/api/v1/courses/:course_id/modules",
+            "/api/v1/courses/:course_id/modules/:module_id",
             [ "course_id", courseId
               "module_id", moduleId ])
-        |> HttpUtils.GetAll<Module>
+        |> HttpUtils.GetSingle<Module>
 
-    let Create(site, accessToken, courseId: Int64, name: string, published: bool) =
+    let Create(site, accessToken, courseId: Int64, name: string, requireSequentialProgress: bool, prerequisiteModuleId: Int64[]) =
+        let prerequisiteModuleIdString = if prerequisiteModuleId.Length > 0 then prerequisiteModuleId.[0].ToString() else null
         CanvasMethodCall.Create(
             site, accessToken,
             "/api/v1/courses/:course_id/modules",
             [ "course_id", courseId :> obj
-              "module[name]", name :> obj ]
-        )
+              "module[name]", name :> obj
+              "module[require_sequential_progress]", requireSequentialProgress :> obj
+              "module[prerequisite_module_ids][]", prerequisiteModuleIdString :> obj
+            ])
         |> HttpUtils.Post<Module>
 
-    let Update(site, accessToken, courseId: Int64, moduleId: Int64, published: bool) =
+    let Edit(site, accessToken, courseId: Int64, moduleId: Int64, published: bool, requireSequentialProgress: bool, prerequisiteModuleId: Int64[]) =
+        let prerequisiteModuleIdString = if prerequisiteModuleId <> null && prerequisiteModuleId.Length > 0 then prerequisiteModuleId.[0].ToString() else null
         CanvasMethodCall.Create(
             site, accessToken,
             "/api/v1/courses/:course_id/modules/:module_id",
             [ "course_id", courseId :> obj
               "module_id", moduleId :> obj
-              "module[published]", published :> obj ]
-        )
+              "module[published]", published :> obj
+              "module[require_sequential_progress]", requireSequentialProgress :> obj
+              "module[prerequisite_module_ids][]", prerequisiteModuleIdString :> obj
+            ])
         |> HttpUtils.Put<Module>
 
     let GetItems(site, accessToken, courseId: Int64, moduleId: Int64) =
@@ -144,6 +159,10 @@ module Modules =
 
         
     let DeleteItems(site, accessToken, courseId, moduleId) =
-        GetItems(site, accessToken, courseId, moduleId)
-        |> Seq.map(fun i -> i.Id)
-        |> Seq.map(fun i -> DeleteItem(site, accessToken, courseId, moduleId, i))
+        seq {
+            for mi in GetItems(site, accessToken, courseId, moduleId) do
+                yield DeleteItem(site, accessToken, courseId, moduleId, mi.Id)
+        }
+        |> Seq.toArray // force it to run
+        |> Array.toSeq
+

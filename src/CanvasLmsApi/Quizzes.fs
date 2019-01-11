@@ -9,6 +9,7 @@ type Quiz =
     { Id: Int64
       Title: string
       HtmlUrl: string
+      QuizType: string
       Published: bool }
 
 module Quizzes =

@@ -44,12 +44,12 @@ type CanvasMethodCall =
             x.AccessToken
 
     member x.GetQueryParameters() =
-        let isUrlParameter (name: string, value: obj) =
+        let isUrlParameter (name: string, _value: obj) =
             let placeholder = sprintf ":%s" name
             x.Endpoint.Contains(placeholder)
         x.Parameters
         |> List.where(isUrlParameter >> not)
-        |> List.map(fun (name, value) -> name, value.ToString())
+        |> List.map(fun (name, value) -> name, if value = null then String.Empty else value.ToString())
 
         
         

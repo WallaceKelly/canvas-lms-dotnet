@@ -37,6 +37,8 @@ type Assignment =
       HtmlUrl: string
       SubmissionTypes: string[]
       Published: bool
+      PointsPossible: Nullable<float>
+      OmitFromFinalGrade: bool
       QuizId: Nullable<Int64> }
     member x.AssignmentSubmissionTypes = x.SubmissionTypes |> Array.map(AssignmentSubmissionType.FromString)
 

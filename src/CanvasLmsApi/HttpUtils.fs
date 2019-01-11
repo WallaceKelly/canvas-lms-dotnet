@@ -35,14 +35,17 @@ let GetAll<'T> (methodCall: CanvasMethodCall) =
         while link.IsSome do
             let response = Http.Request(link.Value, query = methodCall.GetQueryParameters())
             match response.Body with
-            | Text(responseString) -> yield! JsonConvert.DeserializeObject<'T seq>(responseString, settings)
             | Binary(_) -> failwith "Binary responses are not handled"
+            | Text(responseString) -> yield! JsonConvert.DeserializeObject<'T seq>(responseString, settings)
             link <- tryGetNextLink methodCall.AccessToken response
     }
     |> Seq.cache
 
 let GetSingle<'T> (methodCall: CanvasMethodCall) =
-    GetAll<'T>(methodCall) |> Seq.tryHead
+    let response = Http.Request(methodCall.GetUrlString(), query = methodCall.GetQueryParameters())
+    match response.Body with
+    | Binary(_) -> failwith "Binary responses are not handled"
+    | Text(responseString) -> JsonConvert.DeserializeObject<'T>(responseString, settings)
 
 let Post<'T> (methodCall: CanvasMethodCall) =
     let response = Http.Request(methodCall.GetUrlString(), body = FormValues(methodCall.GetQueryParameters()), httpMethod = "Post")

@@ -46,6 +46,12 @@ type Activity =
         | Discussion(d) -> d.Id.ToString()
         | Quiz(q) -> q.Id.ToString()
         | Page(p) -> p.Url
+     static member ToNeedsDueDate a =
+        match a with
+        | Assignment(a) -> a.PointsPossible.GetValueOrDefault(0.) > 0. && not a.OmitFromFinalGrade
+        | Discussion(d) -> false
+        | Quiz(q) -> q.QuizType = "assignment"
+        | Page(p) -> false
 
      member x.ActivityType = x |> Activity.ToActivityType
      member x.IdString = x |> Activity.ToIdString
@@ -53,6 +59,7 @@ type Activity =
      member x.HtmlUrl = x |> Activity.GetHtmlUrl
      member x.ModuleItemContentId = x |> Activity.ToModuleItemContentId
      member x.ModuleItemType = x |> Activity.ToModuleItemType
+     member x.NeedsDueDate = x |> Activity.ToNeedsDueDate
 
      member x.IsPublished = 
         match x with
@@ -99,8 +106,11 @@ module Activities =
             else q :> obj
         |> fun o -> o :?> 'T
 
-    let CreateModule(site, accessToken, courseId: Int64, moduleName: string, activities: Activity seq, isPublished: bool) =
-        let newModule = Modules.Create(site, accessToken, courseId, moduleName, isPublished)
+    let CreateModule(site, accessToken, courseId: Int64,
+                        moduleName: string, activities: Activity seq,
+                        requiresSequentialProgress: bool,
+                        prerequisiteModuleId: Int64[]) =
+        let newModule = Modules.Create(site, accessToken, courseId, moduleName, requiresSequentialProgress, prerequisiteModuleId)
         let getRequirement (a: Activity) =
             match a with
             | Page(_) -> ModuleItemCompletionRequirement.MustView
