@@ -23,9 +23,17 @@ let main argv =
 
     let courseId = getInput "Enter a course number" |> Convert.ToInt64
 
-    //let modules = Modules.GetAll(site, token, courseId)
-    //for m in modules do
-    //    printfn "%d\t%s" m.Id m.Name
+    let modules = Modules.GetAll(site, token, courseId)
+    for m in modules do
+        printfn "%d\t%s" m.Id m.Name
+
+    modules
+    |> Seq.iter(fun m ->
+        // printfn "Deleting site %A, token %A, course %A, module %A" site token courseId m.Id
+        // Modules.DeleteItems(site, token, courseId, m.Id) |> Seq.iter(fun i -> printfn "Removed %s" i.Title)
+        Modules.Delete(site, token, courseId, m.Id) |> fun _ -> printfn "--> Deleted %s" m.Name
+        )
+    printfn "Course modules deleted."    
 
     //let moduleId = getInput "Enter a module number" |> Convert.ToInt64
     //let moduleItems = Modules.GetItems(site, token, courseId, moduleId)
@@ -41,9 +49,8 @@ let main argv =
     //match activity with
     //| None -> failwith "Could not find matching activity"
     //| Some(a) ->
-
     //    let newModuleName = getInput "Enter a new module name" 
-    //    let newModule = Activities.CreateModule(site, token, courseId, newModuleName, [ a ], false, false, Seq.empty)
+    //    let newModule = Activities.CreateModule(site, token, courseId, newModuleName, [ a ], false, [||])
     //    let newModuleItems = Modules.GetItems(site, token, courseId, newModule.Id)
     //    for i in newModuleItems do
     //        printfn "%d\t%s (%A)" i.Id i.Title i.ModuleItemType
@@ -55,16 +62,16 @@ let main argv =
     //    Console.ReadKey(true) |> ignore
     //    Modules.Delete(site, token, courseId, newModule.Id) |> ignore
 
-    let newModule1 = Modules.Create(site, token, courseId, "My New Module #4", true, [||])
-    printfn "Created module #%d" newModule1.Id
-    Activities.GetAll(site, token, courseId)
-    |> Seq.take(5)
-    |> Seq.map(fun a ->
-        Modules.CreateItem(site, token, courseId, newModule1.Id, a.ModuleItemType, a.ModuleItemContentId, ModuleItemCompletionRequirement.MustView)
-       )
-    |> Seq.iter(fun mi -> printfn "Added %s" mi.Title)
+    //let newModule1 = Modules.Create(site, token, courseId, "My New Module #4", true, [||])
+    //printfn "Created module #%d" newModule1.Id
+    //Activities.GetAll(site, token, courseId)
+    //|> Seq.take(5)
+    //|> Seq.map(fun a ->
+    //    Modules.CreateItem(site, token, courseId, newModule1.Id, a.ModuleItemType, a.ModuleItemContentId, ModuleItemCompletionRequirement.MustView)
+    //   )
+    //|> Seq.iter(fun mi -> printfn "Added %s" mi.Title)
 
-    let newModule2 = Modules.Create(site, token, courseId, "My New Module #5", true, [| newModule1.Id |])
-    printfn "Created module #%d" newModule2.Id
+    //let newModule2 = Modules.Create(site, token, courseId, "My New Module #5", true, [| newModule1.Id |])
+    //printfn "Created module #%d" newModule2.Id
     
     0 // return an integer exit code
