@@ -34,10 +34,13 @@ let GetAll<'T> (methodCall: CanvasMethodCall) =
     seq {
         while link.IsSome do
             let response = Http.Request(link.Value, query = methodCall.GetQueryParameters())
-            match response.Body with
-            | Binary(_) -> failwith "Binary responses are not handled"
-            | Text(responseString) -> yield! JsonConvert.DeserializeObject<'T seq>(responseString, settings)
-            link <- tryGetNextLink methodCall.AccessToken response
+            match response.StatusCode with
+            | 200 ->
+                match response.Body with
+                | Binary(_) -> failwith "Binary responses are not handled"
+                | Text(responseString) -> yield! JsonConvert.DeserializeObject<'T seq>(responseString, settings)
+                link <- tryGetNextLink methodCall.AccessToken response
+            | _ -> failwithf "Link %s failed with %d (%s)" link.Value ((int)response.StatusCode) (response.StatusCode.ToString())
     }
     |> Seq.cache
 

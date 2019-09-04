@@ -8,17 +8,15 @@ type CanvasMethodCall =
       Endpoint: string
       Parameters: list<string * obj> }
 
-    static member Create(baseUrl, accessToken, endpoint) =
-        { CanvasMethodCall.BaseUrl = baseUrl
-          AccessToken = accessToken 
-          Endpoint = endpoint
-          Parameters = [] }
-
     static member Create(baseUrl, accessToken, endpoint, parameters: list<string * obj>) =
-        { CanvasMethodCall.BaseUrl = baseUrl
+        let server = Uri(baseUrl).GetLeftPart(UriPartial.Authority)
+        { CanvasMethodCall.BaseUrl = server
           AccessToken = accessToken 
           Endpoint = endpoint
           Parameters = parameters }
+
+    static member Create(baseUrl, accessToken, endpoint) =
+        CanvasMethodCall.Create(baseUrl, accessToken, endpoint, list<string * obj>.Empty)
 
     static member Create(baseUrl, accessToken, endpoint, parameters: list<string * string>) =
         CanvasMethodCall.Create(baseUrl, accessToken, endpoint,
@@ -28,7 +26,7 @@ type CanvasMethodCall =
         CanvasMethodCall.Create(baseUrl, accessToken, endpoint,
             parameters |> List.map(fun (name, value) -> name, value :> obj ))
 
-    member x.GetUrlString() =
+    member x.GetUrlString() = 
 
         let replaceEndpointParameter (endpoint: string) (name: string, value: obj) =
             let placeholder = sprintf ":%s" name
