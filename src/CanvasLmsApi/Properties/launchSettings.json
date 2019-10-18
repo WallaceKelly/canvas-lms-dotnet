@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "CanvasLmsApi": {
+      "commandName": "Executable",
+      "executablePath": "fsi.exe",
+      "commandLineArgs": "\"C:\\Users\\wekel\\Projects\\my-projects\\CanvasUtils\\DeleteAllModules.fsx\" https://canvas.instructure.com/courses/1376508 7~wS4EZic3CuXcN6R185v18xb8OtLc4q6pBFFxOtKZdJpzR2Cd1cCz1hFEi4hogINM"
+    }
+  }
+}
