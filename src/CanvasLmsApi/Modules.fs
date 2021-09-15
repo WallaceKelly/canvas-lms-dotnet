@@ -136,7 +136,8 @@ module Modules =
               "module_id", moduleId :> obj
               "module_item[type]", itemType.ToString() :> obj
               contentIdParameter
-              "module_item[completion_requirement][type]", requirement.ToString() :> obj] )
+              if requirement <> NoRequirement then
+                "module_item[completion_requirement][type]", requirement.ToString() :> obj] )
         |> HttpUtils.Post<ModuleItem> 
 
     let Delete(site, accessToken, courseId: Int64, moduleId: Int64) =
